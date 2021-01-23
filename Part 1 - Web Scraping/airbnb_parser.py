@@ -175,7 +175,7 @@ class Parser:
     def process_search_pages(self):
         """Extract features from all search pages"""
         features_list = []
-        for page in self.url_list[:3]: # TODO remove the slicing
+        for page in self.url_list:
             listings = extract_listings(page)
             for listing in listings:
                 features = extract_page_features(listing, RULES_SEARCH_PAGE)
