@@ -17,7 +17,7 @@ RULES_SEARCH_PAGE = {
     'name': {'tag': 'div', 'class': '_hxt6u1e', 'get': 'aria-label'},
     'header': {'tag': 'div', 'class': '_b14dlit'},
     'rooms': {'tag': 'div', 'class': '_kqh46o'},
-    'type_business': {'tag': 'div', 'class': '_kqh46o', 'order': 1},
+    'facilities': {'tag': 'div', 'class': '_kqh46o', 'order': 1},
     'badge': {'tag': 'div', 'class': '_17bkx6k'},
     'rating_n_reviews': {'tag': 'span', 'class': '_18khxk1'},
     'price': {'tag': 'span', 'class': '_1p7iugi'},
