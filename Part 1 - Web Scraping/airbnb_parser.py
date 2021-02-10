@@ -10,7 +10,7 @@ import pandas as pd
 
 from multiprocessing import Pool
 
-MAYRHOFEN_LINK = 'https://www.airbnb.com/s/Mayrhofen--Austria/homes?tab_id=home_tab&refinement_paths%5B%5D=%2Fhomes&query=Mayrhofen%2C%20Austria&place_id=ChIJbzLYLzjdd0cRDtGuTzM_vt4&checkin=2021-02-06&checkout=2021-02-13&adults=4&source=structured_search_input_header&search_type=autocomplete_click'
+MAYRHOFEN_LINK = 'https://www.airbnb.com/s/Mayrhofen--Austria/homes?query=Mayrhofen%2C%20Austria&checkin=2021-03-06&checkout=2021-03-13&adults=4'
 
 RULES_SEARCH_PAGE = {
     'url': {'tag': 'a', 'get': 'href'},
@@ -51,15 +51,25 @@ RULES_DETAIL_PAGE = {
 }
 
 
-def extract_listings(page_url):
+def extract_listings_retry(page_url, attempts=10):
     """Extracts all listings from a given page"""
     
-    answer = requests.get(page_url, timeout=5)
-    content = answer.content
-    soup = BeautifulSoup(content, features='html.parser')
-    listings = soup.findAll("div", {"class": "_8s3ctt"})
+    listings_max = 0
+    for idx in range(attempts):
+        answer = requests.get(page_url, timeout=5)
+        content = answer.content
+        soup = BeautifulSoup(content, features='html.parser')
+        listings = soup.findAll("div", {"class": "_gig1e7"})
+
+        if len(listings) == 20:
+            listings_out = listings
+            break
+
+        if len(listings) >= listings_max:
+            listings_max = len(listings)
+            listings_out = listings
     
-    return listings
+    return listings_out
         
         
 def extract_element_data(soup, params):
@@ -87,8 +97,8 @@ def extract_element_data(soup, params):
     return output
 
 
-def extract_page_features(soup, rules):
-    """Extracts all features from the page"""
+def extract_listing_features(soup, rules):
+    """Extracts all features from the listing"""
     features_dict = {}
     for feature in rules:
         try:
@@ -128,17 +138,18 @@ def extract_soup_js(listing_url, waiting_time=[5, 2]):
 
 
 def scrape_detail_page(base_features):
+    """Scrapes the detail page and merges the result with basic features"""
+    
     detailed_url = 'https://www.airbnb.com' + base_features['url']
     soup_detail = extract_soup_js(detailed_url)
 
-    features_detailed = extract_page_features(soup_detail, RULES_DETAIL_PAGE)
+    features_detailed = extract_listing_features(soup_detail, RULES_DETAIL_PAGE)
     features_amentities = extract_amentities(soup_detail)
 
     features_detailed['amentities'] = features_amentities
     features_all = {**base_features, **features_detailed}
 
     return features_all
-
 
 
 def extract_amentities(soup):
@@ -163,7 +174,6 @@ class Parser:
     
     def build_urls(self, listings_per_page=20, pages_per_location=15):
         """Builds links for all search pages for a given location"""
-        
         url_list = []
         for i in range(pages_per_location):
             offset = listings_per_page * i
@@ -176,9 +186,10 @@ class Parser:
         """Extract features from all search pages"""
         features_list = []
         for page in self.url_list:
-            listings = extract_listings(page)
+            listings = extract_listings_retry(page)
             for listing in listings:
-                features = extract_page_features(listing, RULES_SEARCH_PAGE)
+                features = extract_listing_features(listing, RULES_SEARCH_PAGE)
+                features['sp_url'] = page
                 features_list.append(features)
 
         self.base_features_list = features_list
@@ -193,15 +204,20 @@ class Parser:
         self.all_features_list = result
 
 
-    def save(self):
-        pd.DataFrame(self.all_features_list).to_csv(self.out_file, index=False)
+    def save(self, feature_set='all'):
+        if feature_set == 'basic':
+            pd.DataFrame(self.base_features_list).to_csv(self.out_file, index=False)
+        elif feature_set == 'all':
+            pd.DataFrame(self.all_features_list).to_csv(self.out_file, index=False)
+        else:
+            pass
             
         
     def parse(self):
         self.build_urls()
         self.process_search_pages()
         self.process_detail_pages()
-        self.save()
+        self.save('all')
 
 
 if __name__ == "__main__":
