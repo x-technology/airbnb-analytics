@@ -53,7 +53,7 @@ RULES_DETAIL_PAGE = {
 }
 
 
-def extract_listings_retry(page_url, attempts=10):
+def extract_listings(page_url, attempts=10):
     """Extracts all listings from a given page"""
     
     listings_max = 0
@@ -188,7 +188,7 @@ class Parser:
         """Extract features from all search pages"""
         features_list = []
         for page in self.url_list:
-            listings = extract_listings_retry(page)
+            listings = extract_listings(page)
             for listing in listings:
                 features = extract_listing_features(listing, RULES_SEARCH_PAGE)
                 features['sp_url'] = page
