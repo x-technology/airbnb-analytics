@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.options import Options
 import json
 import time
 
+import os
+
 import pandas as pd
 
 from multiprocessing import Pool
@@ -196,7 +198,8 @@ class Parser:
         
 
     def process_detail_pages(self):
-        with Pool(8) as pool:
+        n_pools = os.cpu_count() // 2
+        with Pool(n_pools) as pool:
             result = pool.map(scrape_detail_page, self.base_features_list)
         pool.close()
         pool.join()
