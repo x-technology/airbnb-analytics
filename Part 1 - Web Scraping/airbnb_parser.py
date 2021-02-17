@@ -2,6 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import ActionChains
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 import json
 import time
@@ -17,36 +22,34 @@ MAYRHOFEN_LINK = 'https://www.airbnb.com/s/Mayrhofen--Austria/homes?query=Mayrho
 RULES_SEARCH_PAGE = {
     'url': {'tag': 'a', 'get': 'href'},
     'name': {'tag': 'div', 'class': '_hxt6u1e', 'get': 'aria-label'},
+    'name_alt': {'tag': 'a', 'get': 'aria-label'},
     'header': {'tag': 'div', 'class': '_b14dlit'},
     'rooms': {'tag': 'div', 'class': '_kqh46o'},
     'facilities': {'tag': 'div', 'class': '_kqh46o', 'order': 1},
     'badge': {'tag': 'div', 'class': '_17bkx6k'},
     'rating_n_reviews': {'tag': 'span', 'class': '_18khxk1'},
     'price': {'tag': 'span', 'class': '_1p7iugi'},
+    'price_alt': {'tag': 'span', 'class': '_olc9rf0'},
     'superhost': {'tag': 'div', 'class': '_ufoy4t'},
 }
 
 RULES_DETAIL_PAGE = {
-    'specialty_1': {'tag': 'div', 'class': '_1qsawv5', 'order': 0},
-    'specialty_2': {'tag': 'div', 'class': '_1qsawv5', 'order': 1},
-    'specialty_3': {'tag': 'div', 'class': '_1qsawv5', 'order': 2},
-    'specialty_4': {'tag': 'div', 'class': '_1qsawv5', 'order': 3},
-    'specialty_5': {'tag': 'div', 'class': '_1qsawv5', 'order': 4},
-    'refundable_1': {'tag': 'div', 'class': '_cexc0g', 'order': 0},
-    'refundable_2': {'tag': 'div', 'class': '_cexc0g', 'order': 1},
+    'location': {'tag': 'span', 'class': '_jfp88qr'},
     
-    'prices_details_1': {'tag': 'li', 'class': '_ryvszj', 'order': 0},
-    'prices_details_2': {'tag': 'li', 'class': '_ryvszj', 'order': 1},
-    'prices_details_3': {'tag': 'li', 'class': '_ryvszj', 'order': 2},
-    'prices_totals_1': {'tag': 'li', 'class': '_adhikmk', 'order': 0},
-    'prices_totals_2': {'tag': 'li', 'class': '_adhikmk', 'order': 1},
+    'specialties_1': {'tag': 'div', 'class': 't1bchdij', 'order': -1},
+    'specialties_2': {'tag': 'div', 'class': '_1qsawv5', 'order': -1},
+
+    'price_per_night': {'tag': 'div', 'class': '_ymq6as'},
     
-    'ratings_cleanliness': {'tag': 'span', 'class': '_4oybiu', 'order': 0},
-    'ratings_accuracy': {'tag': 'span', 'class': '_4oybiu', 'order': 1},
-    'ratings_communication': {'tag': 'span', 'class': '_4oybiu', 'order': 2},
-    'ratings_location': {'tag': 'span', 'class': '_4oybiu', 'order': 3},
-    'ratings_checkin': {'tag': 'span', 'class': '_4oybiu', 'order': 4},
-    'ratings_value': {'tag': 'span', 'class': '_4oybiu', 'order': 5},
+    'refundables': {'tag': 'div', 'class': '_cexc0g', 'order': -1},
+        
+    'prices_1': {'tag': 'li', 'class': '_ryvszj', 'order': -1},
+    'prices_2': {'tag': 'li', 'class': '_adhikmk', 'order': -1},
+    
+    'listing_ratings': {'tag': 'span', 'class': '_4oybiu', 'order': -1},
+    
+    'host_joined': {'tag': 'div', 'class': '_1fg5h8r', 'order': 1},
+    'host_feats': {'tag': 'span', 'class': '_pog3hg', 'order': -1},
     
     'lang_responses': {'tag': 'li', 'class': '_1q2lt74', 'order': -1},
     'house_rules': {'tag': 'div', 'class': '_u827kd', 'order': -1},
@@ -70,7 +73,7 @@ def extract_listings(page_url, attempts=10):
         if len(listings) >= listings_max:
             listings_max = len(listings)
             listings_out = listings
-    
+
     return listings_out
         
         
@@ -111,7 +114,7 @@ def extract_listing_features(soup, rules):
     return features_dict
 
 
-def extract_soup_js(listing_url, waiting_time=[5, 2]):
+def extract_soup_js(listing_url, waiting_time=[20, 1]):
     """Extracts HTML from JS pages: open, wait, click, wait, extract"""
 
     options = Options()
@@ -119,19 +122,42 @@ def extract_soup_js(listing_url, waiting_time=[5, 2]):
     options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(options=options)
 
+    # waiting for an element on the bottom of the page to load
     driver.get(listing_url)
-    time.sleep(waiting_time[0])
-    
+    try:
+        myElem = WebDriverWait(driver, waiting_time[0]).until(EC.presence_of_element_located((By.CLASS_NAME, '_4971jm')))
+    except:
+        pass
+
+    # looking for price details
+    price_dropdown = 0
+    try:
+        element = driver.find_element_by_class_name('_gby1jkw')
+        price_dropdown = 1
+    except:
+        pass
+
+    # if the element is present - click on it
+    if price_dropdown == 1:
+        for i in range(10): # 10 attempts to scroll to the price button
+            try:
+                actions = ActionChains(driver)
+                driver.execute_script("arguments[0].scrollIntoView(true);", element);
+                actions.move_to_element_with_offset(element, 5, 5)
+                actions.click().perform()
+                break
+            except:
+                pass
+        
+    # looking for amentities
+    driver.execute_script("window.scrollTo(0, 0);")
     try:
         driver.find_element_by_class_name('_13e0raay').click()
     except:
         pass # amentities button not found
-    try:
-        driver.find_element_by_class_name('_gby1jkw').click()
-    except:
-        pass # prices button not found
-    
+
     time.sleep(waiting_time[1])
+
     detail_page = driver.page_source
 
     driver.quit()
@@ -198,6 +224,7 @@ class Parser:
         
 
     def process_detail_pages(self):
+        """Runs detail pages processing in parallel"""
         n_pools = os.cpu_count() // 2
         with Pool(n_pools) as pool:
             result = pool.map(scrape_detail_page, self.base_features_list)
@@ -227,4 +254,4 @@ if __name__ == "__main__":
     new_parser = Parser(MAYRHOFEN_LINK, './test.csv')
     t0 = time.time()
     new_parser.parse()
-    print(time.time() - t0)
+    print(location, time.time() - t0)
