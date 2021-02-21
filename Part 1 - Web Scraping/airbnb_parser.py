@@ -122,8 +122,14 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
     options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(options=options)
 
+    # if the URL is not valid - return an empty soup
+    try:
+        driver.get(listing_url)
+    except:
+        print(f"Wrong URL: {listing_url}")
+        return BeautifulSoup('', features='html.parser')
+    
     # waiting for an element on the bottom of the page to load
-    driver.get(listing_url)
     try:
         myElem = WebDriverWait(driver, waiting_time[0]).until(EC.presence_of_element_located((By.CLASS_NAME, '_4971jm')))
     except:
