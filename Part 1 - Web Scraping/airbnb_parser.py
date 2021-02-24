@@ -117,10 +117,13 @@ def extract_listing_features(soup, rules):
 def extract_soup_js(listing_url, waiting_time=[20, 1]):
     """Extracts HTML from JS pages: open, wait, click, wait, extract"""
 
+    chrome_options = webdriver.ChromeOptions()
+    prefs = {"profile.managed_default_content_settings.images": 2} # do not load images
+    chrome_options.add_experimental_option("prefs", prefs)
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options, chrome_options=chrome_options)
 
     # if the URL is not valid - return an empty soup
     try:
