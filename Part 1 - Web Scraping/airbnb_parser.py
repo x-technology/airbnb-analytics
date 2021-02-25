@@ -138,6 +138,12 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
     except:
         pass
 
+    # click cookie policy
+    try:
+        driver.find_element_by_xpath("/html/body/div[6]/div/div/div[1]/section/footer/div[2]/button").click()
+    except:
+        pass
+
     # looking for price details
     price_dropdown = 0
     try:
@@ -146,11 +152,6 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
     except:
         pass
 
-    # click cookie policy
-    try:
-        driver.find_element_by_xpath("/html/body/div[6]/div/div/div[1]/section/footer/div[2]/button").click()
-    except:
-        pass
 
     # if the element is present - click on it
     if price_dropdown == 1:
