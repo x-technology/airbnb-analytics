@@ -146,6 +146,12 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
         driver.find_element_by_xpath("/html/body/div[6]/div/div/div[1]/section/footer/div[2]/button").click()
     except:
         pass
+    # alternative click cookie policy
+    try:
+        element = driver.find_element_by_xpath("//*[@data-testid='main-cookies-banner-container']")
+        element.find_element_by_xpath("//button[@data-testid='accept-btn']").click()
+    except:
+        pass
 
     # looking for price details
     price_dropdown = 0
