@@ -60,11 +60,16 @@ def extract_listings(page_url, attempts=10):
     """Extracts all listings from a given page"""
     
     listings_max = 0
+    listings_out = [BeautifulSoup('', features='html.parser')]
     for idx in range(attempts):
-        answer = requests.get(page_url, timeout=5)
-        content = answer.content
-        soup = BeautifulSoup(content, features='html.parser')
-        listings = soup.findAll("div", {"class": "_gig1e7"})
+        try:
+            answer = requests.get(page_url, timeout=5)
+            content = answer.content
+            soup = BeautifulSoup(content, features='html.parser')
+            listings = soup.findAll("div", {"class": "_gig1e7"})
+        except:
+            # if no response - return a list with an empty soup
+            listings = [BeautifulSoup('', features='html.parser')]
 
         if len(listings) == 20:
             listings_out = listings
