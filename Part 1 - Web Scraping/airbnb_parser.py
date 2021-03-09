@@ -17,7 +17,7 @@ import pandas as pd
 
 from multiprocessing import Pool
 
-MAYRHOFEN_LINK = 'https://www.airbnb.com/s/Mayrhofen--Austria/homes?query=Mayrhofen%2C%20Austria&checkin=2021-03-06&checkout=2021-03-13&adults=4'
+MAYRHOFEN_LINK = 'https://www.airbnb.com/s/Mayrhofen--Austria/homes?query=Mayrhofen%2C%20Austria&checkin=2021-04-06&checkout=2021-04-13&adults=4'
 
 RULES_SEARCH_PAGE = {
     'url': {'tag': 'a', 'get': 'href'},
@@ -278,4 +278,4 @@ if __name__ == "__main__":
     new_parser = Parser(MAYRHOFEN_LINK, './test.csv')
     t0 = time.time()
     new_parser.parse()
-    print(location, time.time() - t0)
+    print(time.time() - t0)
