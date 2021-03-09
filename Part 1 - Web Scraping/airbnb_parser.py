@@ -161,7 +161,6 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
     except:
         pass
 
-
     # if the element is present - click on it
     if price_dropdown == 1:
         for i in range(10): # 10 attempts to scroll to the price button
@@ -174,12 +173,12 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
             except:
                 pass
         
-    # looking for amentities
+    # looking for amenities
     driver.execute_script("window.scrollTo(0, 0);")
     try:
         driver.find_element_by_class_name('_13e0raay').click()
     except:
-        pass # amentities button not found
+        pass # amenities button not found
 
     time.sleep(waiting_time[1])
 
@@ -197,26 +196,26 @@ def scrape_detail_page(base_features):
     soup_detail = extract_soup_js(detailed_url)
 
     features_detailed = extract_listing_features(soup_detail, RULES_DETAIL_PAGE)
-    features_amentities = extract_amentities(soup_detail)
+    features_amenities = extract_amenities(soup_detail)
 
-    features_detailed['amentities'] = features_amentities
+    features_detailed['amenities'] = features_amenities
     features_all = {**base_features, **features_detailed}
 
     return features_all
 
 
-def extract_amentities(soup):
-    amentities = soup.find_all('div', {'class': '_aujnou'})
+def extract_amenities(soup):
+    amenities = soup.find_all('div', {'class': '_aujnou'})
     
-    amentities_dict = {}
-    for amentity in amentities:
-        header = amentity.find('div', {'class': '_1crk6cd'}).get_text()
-        values = amentity.find_all('div', {'class': '_1dotkqq'})
+    amenities_dict = {}
+    for amenity in amenities:
+        header = amenity.find('div', {'class': '_1crk6cd'}).get_text()
+        values = amenity.find_all('div', {'class': '_1dotkqq'})
         values = [v.find(text=True) for v in values]
         
-        amentities_dict['amentity_' + header] = values
+        amenities_dict['amenity_' + header] = values
         
-    return json.dumps(amentities_dict)
+    return json.dumps(amenities_dict)
 
 
 class Parser:
