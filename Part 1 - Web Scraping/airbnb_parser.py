@@ -124,7 +124,6 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
 
     options = Options()
     options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
     options.add_argument('--blink-settings=imagesEnabled=false')
     driver = webdriver.Chrome(options=options)
 
@@ -135,7 +134,7 @@ def extract_soup_js(listing_url, waiting_time=[20, 1]):
         print(f"Wrong URL: {listing_url}")
         return BeautifulSoup('', features='html.parser')
     
-    # waiting for an element on the bottom of the page to load
+    # waiting for an element on the bottom of the page to load ("More places to stay")
     try:
         myElem = WebDriverWait(driver, waiting_time[0]).until(EC.presence_of_element_located((By.CLASS_NAME, '_4971jm')))
     except:
