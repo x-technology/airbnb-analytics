@@ -7,7 +7,7 @@
 3) Build a machine learning model for listing price prediction
 4) Based on the model, develop a tool (e.g. Chrome extension) to help users navigate
 
-#### Series of articles on [Medium](smithio.medium.com):
+#### Series of articles on [Medium](https://smithio.medium.com):
 - [Part 0 - Intro to the project](https://smithio.medium.com/educational-data-science-project-b4f54c7cab19)
 - [Part 1 - Scrape the data from Airbnb website](https://smithio.medium.com/scraping-airbnb-website-with-python-beautiful-soup-and-selenium-8ec86e327b6c)
 - [Part 2 - More details to Web Scraping](https://smithio.medium.com/more-details-to-web-scraping-with-python-and-selenium-c32ac614c558)
