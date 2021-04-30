@@ -15,3 +15,11 @@
 #### Webinars on [Youtube](https://www.youtube.com/channel/UCQZNnzybEi0vvNbeDB0qABQ):
 - [Scraping Airbnb website with Python and Beautiful Soup](https://youtu.be/B7uOXdHc8jc)
 - [Scraping Airbnb website with Python and Selenium](https://youtu.be/L8ooiuBnZ8M)
+
+#### Authors
+
+- [Igor Smirnov](https://github.com/smithio)
+
+![igor photo](https://github.com/x-technology/PizzaScript/blob/main/assets/igor-small.jpg)
+
+A data scientist with more than 10 years of industry experience performing data analysis. Since 2015 is more focused on b2c domain. Loves the customers
