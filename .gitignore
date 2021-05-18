@@ -1,5 +1,6 @@
 *.ipynb
 *.csv
 
+.env
 .vscode
 __pycache__
