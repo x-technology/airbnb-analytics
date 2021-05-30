@@ -15,6 +15,7 @@
 #### Webinars on [Youtube](https://www.youtube.com/channel/UCQZNnzybEi0vvNbeDB0qABQ):
 - [Scraping Airbnb website with Python and Beautiful Soup](https://youtu.be/B7uOXdHc8jc)
 - [Scraping Airbnb website with Python and Selenium](https://youtu.be/L8ooiuBnZ8M)
+- [Airbnb data cleaning](https://www.youtube.com/watch?v=6iJ8MMDNQ9c&t=86s)
 
 #### Authors
 
